@@ -1,4 +1,4 @@
-# Personal Expense Tracker - Quản Lý Chi Tiêu Cá Nhân (Anti-Gravity UI)
+# Personal Expense Tracker - Quản Lý Chi Tiêu Cá Nhân 
 
 Ứng dụng quản lý chi tiêu cá nhân hiện đại, được xây dựng bằng **Flutter** theo kiến trúc **Clean Architecture**, tích hợp **Supabase** để lưu trữ đám mây. Giao diện được thiết kế theo phong cách **Glassmorphism** lấp lánh và hiện đại.
 
