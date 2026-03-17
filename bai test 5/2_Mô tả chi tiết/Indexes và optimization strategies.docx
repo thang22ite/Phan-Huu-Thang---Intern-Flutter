@@ -1,0 +1,5 @@
+Lý thuyết về Index B-Tree được áp dụng ở đây để tối ưu hóa thời gian quét ổ cứng:
+
+    -idx_batches_expiry: Đánh index dạng ASC (tăng dần) trên expiry_date. Khi App cần đề xuất xuất kho theo nguyên tắc FEFO (First Expired First Out), DB Engine sẽ lấy dữ liệu từ Index Tree ra ngay lập tức mà không cần quyét (Full Table Scan) hàng triệu dòng lô hàng.
+
+    -idx_stock_movements_plant_time: Composite Index (Index đa cột). Khi thủ kho muốn xem lịch sử giao dịch "Hôm nay của nhà máy Tiên Sơn", DB sẽ duyệt thẳng tới node chứa plant_id và quét theo created_at đã được sắp xếp sẵn.

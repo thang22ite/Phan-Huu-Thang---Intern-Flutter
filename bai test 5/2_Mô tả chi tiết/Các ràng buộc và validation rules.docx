@@ -1,0 +1,5 @@
+CHECK (quantity >= 0) trên stock_levels: Ràng buộc cấp cơ sở dữ liệu. Ngay cả khi code Flutter hoặc Backend bị lỗi logic tính toán, Database sẽ từ chối giao dịch làm tồn kho rớt xuống dưới 0, bảo vệ tính chính xác tuyệt đối.
+
+UNIQUE(location_id, batch_id) trên stock_levels: Lý thuyết về chuẩn hóa dữ liệu. Ngăn chặn hiện tượng "Phantom Rows" (cùng 1 lô, ở cùng 1 vị trí nhưng lại tách thành 2 dòng riêng biệt do lỗi insert đồng thời). Điều này cho phép sử dụng cơ chế UPSERT (Insert on Conflict).
+
+CHECK trên stock_movements: Đảm bảo một giao dịch kho phải có Nguồn (from_location_id) HOẶC Đích (to_location_id), cấm trường hợp cả 2 đều NULL (giao dịch ma).

@@ -1,0 +1,17 @@
+Bảng stock_movements (Lịch sử giao dịch) là bảng "phình" to nhanh nhất. Với một nhà máy hoạt động 3 ca, bảng này có thể đạt hàng chục triệu dòng mỗi năm. Nếu không xử lý, việc truy xuất báo cáo sẽ bị chậm (Timeout).
+
+**Giải pháp: Table Partitioning (Phân mảnh dữ liệu)
+Thay vì lưu tất cả vào 1 bảng vật lý, ta áp dụng lý thuyết Declarative Partitioning của PostgreSQL, chia bảng theo phạm vi thời gian (Range Partitioning).
+
+Ví dụ cấu trúc kiến trúc:
+Hệ thống sẽ tự động tạo ra các bảng con vật lý dưới nền:
+
+stock_movements_2026_01 (Lưu data tháng 1)
+
+stock_movements_2026_02 (Lưu data tháng 2)
+
+**Tại sao việc này tối ưu:
+
+Index luôn nhỏ: Cây Index của tháng hiện tại rất nhỏ, giúp việc INSERT log giao dịch diễn ra tức thời không bị độ trễ.
+
+Truy vấn siêu tốc (Partition Pruning): Khi người dùng muốn xem báo cáo tháng 2, PostgreSQL Engine sẽ tự động bỏ qua bảng tháng 1 và các tháng khác, chỉ quét đúng bảng vật lý của tháng 2, giảm 90% lượng dữ liệu phải đọc từ đĩa cứng.

@@ -1,0 +1,44 @@
+1. Bảng plants (Nhà máy)
+Các trường dữ liệu: id, name, address, created_at.
+Mục đích: Đây là bảng gốc rễ (Root Master Data) của toàn bộ hệ thống. Bảng này dùng để lưu trữ thông tin về các nhà máy vật lý của Vinamilk (ví dụ: Nhà máy sữa Tiên Sơn, Nhà máy sữa Bình Dương).
+Cơ sở lý thuyết thiết kế: Bảng này ứng dụng lý thuyết Multi-tenant Architecture (Kiến trúc đa khách thuê) ở cấp độ vật lý. Việc có trường id của nhà máy làm gốc rễ cho phép thiết lập các chính sách bảo mật Row Level Security (RLS) sau này, đảm bảo dữ liệu của nhà máy nào được cô lập hoàn toàn với nhà máy đó.
+
+2. Bảng warehouses (Kho bãi)
+Các trường dữ liệu: id, plant_id, name, type, created_at.
+Mục đích: Phân chia các khu vực lưu trữ lớn bên trong một nhà máy cụ thể. Một nhà máy có thể có Kho nguyên liệu (sữa thô, đường), Kho bao bì (vỏ hộp), và Kho thành phẩm (sữa hộp đã đóng gói).
+Cơ sở lý thuyết thiết kế: Áp dụng lý thuyết Relational Categorization (Phân loại có quan hệ). Bằng cách dùng khóa ngoại plant_id, hệ thống tạo ra mối quan hệ 1-N (Một nhà máy có nhiều kho), giúp việc phân bổ không gian logic trở nên rõ ràng và dễ quản lý khi nhà máy mở rộng thêm kho mới.
+
+3. Bảng locations (Vị trí lưu kho chi tiết)
+Các trường dữ liệu: id, warehouse_id, aisle, shelf, bin.
+Mục đích: Xác định tọa độ 3D chính xác của một pallet hàng hóa bên trong một nhà kho. Ví dụ: Dãy (Aisle) A, Tầng (Shelf) 2, Ô (Bin) 05.
+Cơ sở lý thuyết thiết kế: Áp dụng lý thuyết Micro-zoning & Spatial Tracking (Phân vùng vi mô và theo dõi không gian). Việc chia nhỏ vị trí và áp dụng ràng buộc UNIQUE(warehouse_id, aisle, shelf, bin) đảm bảo tính toàn vẹn vật lý ảo trong cơ sở dữ liệu, ngăn chặn việc hệ thống sinh ra hai vị trí trùng lặp gây nhầm lẫn cho xe nâng hoặc công nhân khi cất hàng.
+
+4. Bảng item_categories (Nhóm hàng hóa)
+Các trường dữ liệu: id, name.
+Mục đích: Phân loại các mặt hàng ở mức độ tổng quan, ví dụ như "Nguyên liệu thô", "Bao bì", "Sản phẩm sữa tươi".
+Cơ sở lý thuyết thiết kế: Bảng này phục vụ cho Database Normalization (Chuẩn hóa cơ sở dữ liệu - Chuẩn 2NF). Thay vì lưu chuỗi text trực tiếp vào từng sản phẩm, việc tạo bảng danh mục giúp thống nhất tên gọi, tránh sai sót do gõ phím và tối ưu hóa tốc độ truy vấn khi lọc báo cáo theo nhóm hàng.
+
+5. Bảng items (Danh mục vật tư và Sản phẩm)
+Các trường dữ liệu: id, category_id, sku, name, unit, created_at.
+Mục đích: Đây là bảng từ điển trung tâm lưu trữ mọi thứ có thể cầm nắm và lưu kho được trong nhà máy. Nó chứa thông tin cơ bản định danh sản phẩm như Mã lưu kho (SKU - Stock Keeping Unit) và Đơn vị tính (Lít, Kg, Thùng).
+Cơ sở lý thuyết thiết kế: Dựa trên nguyên lý Master Data Management - MDM (Quản lý dữ liệu chủ). Trường sku được đánh ràng buộc UNIQUE đóng vai trò là ngôn ngữ chung duy nhất giữa hệ thống kho (WMS), hệ thống kế toán (ERP) và hệ thống bán hàng (CRM).
+
+6. Bảng bill_of_materials (Định mức nguyên vật liệu - BOM)
+Các trường dữ liệu: id, parent_item_id, component_item_id, quantity_required, created_at.
+Mục đích: Định nghĩa "công thức nấu ăn" cho nhà máy. Bảng này cho biết để tạo ra một thành phẩm (Ví dụ: 1 thùng sữa tươi 100%), hệ thống cần xuất kho chính xác bao nhiêu lít sữa thô và bao nhiêu kg bao bì giấy.
+Cơ sở lý thuyết thiết kế: Bảng này là cốt lõi của Material Requirements Planning - MRP (Lên kế hoạch nhu cầu nguyên vật liệu). Nó sử dụng cấu trúc đệ quy/phân cấp (Hierarchical Data Modeling) bằng cách liên kết hai khóa ngoại cùng trỏ về bảng items, giúp hệ thống tự động hóa việc tính toán hao hụt nguyên liệu khi có lệnh sản xuất.
+
+7. Bảng batches (Lô hàng)
+Các trường dữ liệu: id, item_id, batch_number, manufacturing_date, expiry_date, created_at.
+Mục đích: Theo dõi vòng đời cụ thể của một mẻ sản xuất. Bảng này tách biệt thông tin của lô hàng (như ngày sản xuất, hạn sử dụng) ra khỏi thông tin chung của sản phẩm.
+Cơ sở lý thuyết thiết kế: Phục vụ trực tiếp cho thuật toán FEFO (First Expired, First Out - Hết hạn trước, Xuất trước) và khả năng Traceability (Truy xuất nguồn gốc). Việc thiết kế bảng riêng giúp hệ thống không phải lưu lặp lại hạn sử dụng ở mỗi vị trí kho, tối ưu hóa không gian đĩa cứng và tăng tốc độ lập chỉ mục (Indexing) để tìm hàng sắp hết hạn.
+
+8. Bảng stock_levels (Tồn kho thực tế)
+Các trường dữ liệu: id, location_id, batch_id, quantity, updated_at.
+Mục đích: Là bức tranh hiện tại của nhà kho. Bảng này trả lời câu hỏi: Ngay lúc này, tại vị trí tọa độ X, đang có bao nhiêu pallet của Lô hàng Y.
+Cơ sở lý thuyết thiết kế: Đây là bảng Intersection Table (Bảng giao) dùng để giải quyết mối quan hệ Nhiều-Nhiều (Many-to-Many) giữa vị trí lưu kho và lô hàng. Các ràng buộc UNIQUE và CHECK quantity >= 0 tại đây đóng vai trò là chốt chặn cuối cùng (Last line of defense), đảm bảo dữ liệu vật lý không bao giờ bị sai lệch hoặc xuất hiện tồn kho âm.
+
+9. Bảng stock_movements (Lịch sử giao dịch kho)
+Các trường dữ liệu: id, plant_id, item_id, batch_id, from_location_id, to_location_id, quantity, type, user_id, created_at.
+Mục đích: Sổ cái ghi chép lại mọi hành động di chuyển vật lý của hàng hóa (Nhập từ nhà cung cấp, Xuất bán, Điều chuyển giữa các dãy kệ, Kiểm kê bù trừ). Bảng này không bao giờ bị xóa dữ liệu.
+Cơ sở lý thuyết thiết kế: Áp dụng hoàn toàn mô hình Event Sourcing (Lưu trữ theo sự kiện) và Audit Trail (Dấu vết kiểm toán). Thay vì chỉ ghi đè trạng thái tồn kho, hệ thống lưu lại các sự kiện làm thay đổi trạng thái đó. Bảng này kết hợp với các Database Triggers để tự động cập nhật bảng stock_levels, đảm bảo nguyên tắc ACID (Tính nguyên tử, Tính nhất quán, Tính cô lập, Tính bền vững) của hệ quản trị cơ sở dữ liệu quan hệ.

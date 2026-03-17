@@ -1,0 +1,8 @@
+Phase 1 - Core Inventory (Số hóa nền tảng):
+Triển khai cấu trúc kho vật lý (Locations), danh mục (Items). Cho phép công nhân sử dụng App Flutter quét mã vạch để Nhập (Inbound) và Xuất (Outbound) thủ công. Ở giai đoạn này, dữ liệu tập trung vào bảng stock_levels để đối soát tồn kho với sổ sách kế toán.
+
+Phase 2 - Traceability & Production (Truy vết & Tích hợp sản xuất):
+Bật tính năng quản lý Batches và BOM. Áp dụng luồng FEFO. Tự động hóa việc xuất kho nguyên vật liệu (Outbound) dựa trên số lượng thành phẩm hoàn thành (Inbound) thông qua định mức BOM.
+
+Phase 3 - Multi-Plant & Automation (Đa nhà máy & Tự động hóa):
+Triển khai RLS chia tách luồng dữ liệu giữa các nhà máy. Tích hợp IoT/AGV (Xe tự hành). Hệ thống tự động tạo các lệnh Transfer để điều phối hàng hóa giữa các kho khô và kho lạnh dựa trên sức chứa.
