@@ -1,6 +1,6 @@
 # Vietnam University Network Graph
 
-Ứng dụng Flutter trực quan hóa mạng lưới các trường đại học tại Việt Nam với phong cách thiết kế **Anti-Gravity** hiện đại, tuân thủ nghiêm ngặt **Clean Architecture** và quản lý trạng thái bằng **Bloc**.
+Ứng dụng Flutter trực quan hóa mạng lưới các trường đại học tại Việt Nam , tuân thủ nghiêm ngặt **Clean Architecture** và quản lý trạng thái bằng **Bloc**.
 
 ## Tổng quan giải pháp
 
